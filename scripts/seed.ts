@@ -2003,6 +2003,49 @@ This course is still in draft while the cluster examples are rewritten against t
     `Created ${countRows(schema.comments)} lesson comments across ${countRows(schema.comments, isNull(schema.comments.parentId))} threads.`
   );
 
+  // ─── Bookmarks and Notes ───
+  // Private to each Student. Emma flags lessons she wants to revisit and keeps
+  // notes in both her courses.
+
+  db.insert(schema.bookmarks)
+    .values([
+      { userId: students[0].id, lessonId: course1LessonIds[4], createdAt: daysAgo(20) },
+      { userId: students[0].id, lessonId: course1LessonIds[12], createdAt: daysAgo(9) },
+      { userId: students[0].id, lessonId: course2LessonIds[3], createdAt: daysAgo(4) },
+      { userId: students[2].id, lessonId: course1LessonIds[1], createdAt: daysAgo(15) },
+    ])
+    .run();
+
+  db.insert(schema.notes)
+    .values([
+      {
+        userId: students[0].id,
+        lessonId: course1LessonIds[4],
+        body: "Rewatch the part on narrowing.\n* typeof for primitives\n* `in` for object shapes",
+        createdAt: daysAgo(20),
+        updatedAt: daysAgo(6),
+      },
+      {
+        userId: students[0].id,
+        lessonId: course2LessonIds[3],
+        body: "Try this with my own API before moving on.",
+        createdAt: daysAgo(4),
+        updatedAt: daysAgo(4),
+      },
+      {
+        userId: students[2].id,
+        lessonId: course1LessonIds[2],
+        body: "# Questions for later\nWhy does this need a generic?",
+        createdAt: daysAgo(14),
+        updatedAt: daysAgo(14),
+      },
+    ])
+    .run();
+
+  console.log(
+    `Created ${countRows(schema.bookmarks)} bookmarks and ${countRows(schema.notes)} notes.`
+  );
+
   // ─── Lesson Progress ───
 
   // Helper to mark lessons as complete
@@ -2849,6 +2892,9 @@ This course is still in draft while the cluster examples are rewritten against t
   console.log(`  Enrollments: ${countRows(schema.enrollments)}`);
   console.log(`  Course ratings: ${countRows(schema.courseRatings)}`);
   console.log(`  Lesson comments: ${countRows(schema.comments)}`);
+  console.log(
+    `  Bookmarks: ${countRows(schema.bookmarks)}, notes: ${countRows(schema.notes)}`
+  );
   console.log(
     `  Lesson progress: ${countRows(schema.lessonProgress)} (${countRows(schema.lessonProgress, eq(schema.lessonProgress.status, LessonProgressStatus.Completed))} completed)`
   );

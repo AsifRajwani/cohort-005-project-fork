@@ -1,3 +1,4 @@
+import type { LessonProgressStatus } from "~/db/schema";
 import { useFetcher } from "react-router";
 import { Clock, Github } from "lucide-react";
 import { Button } from "~/components/ui/button";
@@ -36,7 +37,7 @@ export type FullLessonData = {
   module: { id: number; title: string };
   lesson: Lesson;
   contentHtml: string | null;
-  lessonStatus: string | null;
+  lessonStatus: LessonProgressStatus | null;
   enrolled: boolean;
   currentUserId: number | null;
   prevLesson: LessonLink | null;
@@ -45,7 +46,7 @@ export type FullLessonData = {
   bestAttempt: BestAttempt | null;
   lastWatchPosition: number;
   watchProgress: number;
-  lessonProgressMap: Record<number, string>;
+  lessonProgressMap: Record<number, LessonProgressStatus>;
   comments: RenderedComment[];
   canModerate: boolean;
   instructorName: string;

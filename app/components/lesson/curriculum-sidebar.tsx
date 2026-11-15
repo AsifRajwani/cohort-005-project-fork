@@ -22,7 +22,7 @@ export function CurriculumSidebar({
   course: { id: number; title: string; slug: string };
   curriculum: Curriculum;
   currentLessonId: number;
-  lessonProgressMap: Record<number, string>;
+  lessonProgressMap: Record<number, LessonProgressStatus>;
   enrolled: boolean;
 }) {
   const [expandedModules, toggleModule] = useExpandedModules(
@@ -101,7 +101,7 @@ function CurriculumLesson({
   lesson: { id: number; title: string };
   isCurrent: boolean;
   /** Undefined for someone not enrolled: every Lesson shows as not started. */
-  status: string | undefined;
+  status: LessonProgressStatus | undefined;
 }) {
   return (
     <li>
@@ -121,7 +121,11 @@ function CurriculumLesson({
   );
 }
 
-function LessonStatusIcon({ status }: { status: string | undefined }) {
+function LessonStatusIcon({
+  status,
+}: {
+  status: LessonProgressStatus | undefined;
+}) {
   if (status === LessonProgressStatus.Completed) {
     return <CheckCircle2 className="size-3.5 shrink-0 text-green-500" />;
   }

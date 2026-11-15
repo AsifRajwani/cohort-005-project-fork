@@ -20,7 +20,14 @@ import { isBookmarked, toggleBookmark } from "~/lib/bookmarks.server";
 import { getNote, saveNote } from "~/lib/notes.server";
 import { MAX_NOTE_LENGTH } from "~/lib/notes";
 import { db } from "~/db";
-import { categories, courses, lessons, modules, users } from "~/db/schema";
+import {
+  categories,
+  courses,
+  lessons,
+  modules,
+  users,
+  type LessonProgressStatus,
+} from "~/db/schema";
 import { eq, or } from "drizzle-orm";
 import { Button } from "~/components/ui/button";
 import { AlertTriangle } from "lucide-react";
@@ -241,10 +248,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     };
   }
 
-  let lessonStatus: string | null = null;
+  let lessonStatus: LessonProgressStatus | null = null;
   let lastWatchPosition = 0;
   let watchProgress = 0;
-  const lessonProgressMap: Record<number, string> = {};
+  const lessonProgressMap: Record<number, LessonProgressStatus> = {};
 
   if (currentUserId) {
     // Progress is recorded only for people who can take the course, so a

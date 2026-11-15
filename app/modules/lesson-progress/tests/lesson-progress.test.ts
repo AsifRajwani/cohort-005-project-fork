@@ -5,6 +5,8 @@ import { LessonProgressStatus } from "~/db/schema";
 import { markdown } from "~/lib/text";
 import { createLessonProgress } from "../index.server";
 
+const NOW = new Date("2026-03-01T12:00:00.000Z");
+
 let db: TestDb;
 let progress: ReturnType<typeof createLessonProgress>;
 let studentId: number;
@@ -67,15 +69,15 @@ describe("marking progress", () => {
 
   it("completes a Lesson that was never opened", () => {
     const lesson = addLesson(addModule(courseId).id);
-    const done = progress.markComplete(studentId, lesson.id);
+    const done = progress.markComplete(studentId, lesson.id, NOW);
     expect(done.status).toBe(LessonProgressStatus.Completed);
-    expect(done.completedAt).not.toBeNull();
+    expect(done.completedAt).toBe(NOW.toISOString());
   });
 
   it("completes a Lesson in progress without adding a second row", () => {
     const lesson = addLesson(addModule(courseId).id);
     const started = progress.markInProgress(studentId, lesson.id);
-    const done = progress.markComplete(studentId, lesson.id);
+    const done = progress.markComplete(studentId, lesson.id, NOW);
     expect(done.id).toBe(started.id);
     expect(progress.get(studentId, lesson.id)?.status).toBe(
       LessonProgressStatus.Completed
@@ -84,7 +86,7 @@ describe("marking progress", () => {
 
   it("keeps a completed Lesson completed when it is opened again", () => {
     const lesson = addLesson(addModule(courseId).id);
-    const done = progress.markComplete(studentId, lesson.id);
+    const done = progress.markComplete(studentId, lesson.id, NOW);
     const reopened = progress.markInProgress(studentId, lesson.id);
     expect(reopened).toEqual(done);
   });
@@ -105,7 +107,7 @@ describe("progress across a course", () => {
     const a = addLesson(first.id, 1);
     const b = addLesson(second.id, 1);
     addLesson(second.id, 2);
-    progress.markComplete(studentId, a.id);
+    progress.markComplete(studentId, a.id, NOW);
     progress.markInProgress(studentId, b.id);
 
     const rows = progress.forCourse(studentId, courseId);
@@ -131,8 +133,8 @@ describe("progress across a course", () => {
       .returning()
       .get();
     const elsewhere = addLesson(addModule(other.id).id);
-    progress.markComplete(studentId, elsewhere.id);
-    progress.markComplete(studentId + 1, lesson.id);
+    progress.markComplete(studentId, elsewhere.id, NOW);
+    progress.markComplete(studentId + 1, lesson.id, NOW);
 
     expect(progress.forCourse(studentId, courseId)).toEqual([]);
   });

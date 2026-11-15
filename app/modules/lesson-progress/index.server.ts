@@ -20,8 +20,9 @@ export function createLessonProgress(database: Db) {
       getLessonProgress(database, userId, lessonId),
     forCourse: (userId: number, courseId: number) =>
       getLessonProgressForCourse(database, userId, courseId),
-    markComplete: (userId: number, lessonId: number) =>
-      markLessonComplete(database, userId, lessonId),
+    /** Completes the Lesson at `now`. */
+    markComplete: (userId: number, lessonId: number, now: Date) =>
+      markLessonComplete(database, { userId, lessonId }, now),
     /** Starts the Lesson; a completed Lesson stays completed. */
     markInProgress: (userId: number, lessonId: number) =>
       markLessonInProgress(database, userId, lessonId),

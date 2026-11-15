@@ -168,3 +168,6 @@ export function computeResult(
     return null;
   }
 }
+
+/** A graded attempt, as the Student sees it after submitting. */
+export type QuizResult = NonNullable<ReturnType<typeof computeResult>>;

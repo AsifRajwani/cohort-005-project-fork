@@ -15,7 +15,11 @@ import { LessonCompletion, type LessonLink } from "./lesson-completion";
 import { LessonNote, type SavedNote } from "./lesson-note";
 import { LessonPager } from "./lesson-pager";
 import { QuizSection } from "./quiz-section";
-import type { Quiz, QuizResult } from "./quiz-types";
+import type {
+  BestAttempt,
+  LessonQuiz as Quiz,
+  QuizResult,
+} from "~/modules/quiz-attempts/index.server";
 import { useAutoplay } from "./use-autoplay";
 
 type Lesson = {
@@ -38,7 +42,7 @@ export type FullLessonData = {
   prevLesson: LessonLink | null;
   nextLesson: LessonLink | null;
   quiz: Quiz | null;
-  bestAttempt: { score: number; passed: boolean } | null;
+  bestAttempt: BestAttempt | null;
   lastWatchPosition: number;
   watchProgress: number;
   lessonProgressMap: Record<number, string>;

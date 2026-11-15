@@ -4,7 +4,7 @@ import { getLessonQuiz } from "./lib/lesson-quiz";
 import { computeResult } from "./lib/grade";
 
 export type { BestAttempt, LessonQuiz } from "./lib/lesson-quiz";
-export type { QuestionResult } from "./lib/grade";
+export type { QuestionResult, QuizResult } from "./lib/grade";
 
 /**
  * A Lesson's quiz and the Students' attempts at it, bound to a database. The

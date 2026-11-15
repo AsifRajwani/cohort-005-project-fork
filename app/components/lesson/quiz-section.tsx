@@ -5,14 +5,18 @@ import { RotateCcw, Trophy } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { QuizHeader, QuizResultCard } from "./quiz-result";
-import type { Quiz, QuizResult } from "./quiz-types";
+import type {
+  BestAttempt,
+  LessonQuiz as Quiz,
+  QuizResult,
+} from "~/modules/quiz-attempts/index.server";
 
 type Answers = Record<number, number>;
 type QuizFetcher = ReturnType<typeof useFetcher>;
 
 type QuizSectionProps = {
   quiz: Quiz;
-  bestAttempt: { score: number; passed: boolean } | null;
+  bestAttempt: BestAttempt | null;
   quizResult: QuizResult | null;
   quizFetcher: QuizFetcher;
   isSubmitting: boolean;

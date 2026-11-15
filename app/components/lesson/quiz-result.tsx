@@ -7,7 +7,11 @@ import {
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
-import type { QuestionResult, Quiz, QuizResult } from "./quiz-types";
+import type {
+  LessonQuiz as Quiz,
+  QuestionResult,
+  QuizResult,
+} from "~/modules/quiz-attempts/index.server";
 
 export function QuizResultCard({
   quiz,

@@ -1,10 +1,11 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import {
   quizzes,
   quizQuestions,
   quizOptions,
   quizAttempts,
   quizAnswers,
+  QuestionType,
 } from "~/db/schema";
 import type { Db } from "./quiz";
 
@@ -28,33 +29,39 @@ type Question = typeof quizQuestions.$inferSelect;
 /** Who is answering which quiz. */
 export type QuizSubmission = { userId: number; quizId: number };
 
-function findCorrectOptionId(db: Db, q: Question) {
-  let correctOptionId = null;
-  if (q.questionType === "multiple_choice") {
-    const opts = db
-      .select()
-      .from(quizOptions)
-      .where(eq(quizOptions.questionId, q.id))
-      .all();
-    const correctOpt = opts.find((o) => o.isCorrect === true);
-    correctOptionId = correctOpt ? correctOpt.id : null;
-  } else if (q.questionType === "true_false") {
-    const correctOpt = db
-      .select()
-      .from(quizOptions)
-      .where(
-        and(eq(quizOptions.questionId, q.id), eq(quizOptions.isCorrect, true))
-      )
-      .get();
-    correctOptionId = correctOpt ? correctOpt.id : null;
+const GRADED_TYPES: readonly QuestionType[] = [
+  QuestionType.MultipleChoice,
+  QuestionType.TrueFalse,
+];
+
+/** Question id to its correct option id, in one query for every question. */
+function findCorrectOptionIds(db: Db, questions: Question[]) {
+  const ids = questions
+    .filter((q) => GRADED_TYPES.includes(q.questionType))
+    .map((q) => q.id);
+  const correctOptionIds = new Map<number, number>();
+  if (ids.length === 0) return correctOptionIds;
+
+  const correct = db
+    .select({ id: quizOptions.id, questionId: quizOptions.questionId })
+    .from(quizOptions)
+    .where(
+      and(inArray(quizOptions.questionId, ids), eq(quizOptions.isCorrect, true))
+    )
+    .orderBy(quizOptions.id)
+    .all();
+  for (const option of correct) {
+    if (!correctOptionIds.has(option.questionId)) {
+      correctOptionIds.set(option.questionId, option.id);
+    }
   }
-  return correctOptionId;
+  return correctOptionIds;
 }
 
 function gradeQuestion(
-  db: Db,
   q: Question,
-  selectedAnswers: Record<number, number>
+  selectedAnswers: Record<number, number>,
+  correctOptionIds: Map<number, number>
 ): QuestionResult {
   const selected = selectedAnswers[q.id];
 
@@ -67,7 +74,7 @@ function gradeQuestion(
     };
   }
 
-  const correctOptionId = findCorrectOptionId(db, q);
+  const correctOptionId = correctOptionIds.get(q.id) ?? null;
   return {
     questionId: q.id,
     correct: selected === correctOptionId,
@@ -116,8 +123,9 @@ function gradeAndSave(
     .orderBy(quizQuestions.position)
     .all();
 
+  const correctOptionIds = findCorrectOptionIds(db, questions);
   const questionResults = questions.map((q) =>
-    gradeQuestion(db, q, selectedAnswers)
+    gradeQuestion(q, selectedAnswers, correctOptionIds)
   );
   const correct = questionResults.filter((r) => r.correct).length;
   const total = questions.length;

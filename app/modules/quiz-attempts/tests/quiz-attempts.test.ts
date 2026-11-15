@@ -199,6 +199,26 @@ describe("submitting a quiz", () => {
     });
   });
 
+  it("counts only the first option marked right when two are", () => {
+    const { quizId, questions } = addQuiz(lessonId, [
+      {
+        type: QuestionType.MultipleChoice,
+        options: [
+          ["right", true],
+          ["also marked right", true],
+        ],
+      },
+    ]);
+    const [q] = questions;
+    const result = quizzes.submit(studentId, quizId, {
+      [q.questionId]: q.options[1],
+    });
+    expect(result?.questionResults[0]).toMatchObject({
+      correct: false,
+      correctOptionId: q.options[0],
+    });
+  });
+
   it("does not pass at exactly 70%", () => {
     const specs = Array.from({ length: 10 }, () => choice);
     const { quizId, questions } = addQuiz(lessonId, specs);

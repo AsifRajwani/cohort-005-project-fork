@@ -5,7 +5,6 @@ import {
   quizOptions,
   quizAttempts,
   quizAnswers,
-  QuestionType,
 } from "~/db/schema";
 import type { Db } from "./quiz";
 
@@ -29,19 +28,10 @@ type Question = typeof quizQuestions.$inferSelect;
 /** Who is answering which quiz. */
 export type QuizSubmission = { userId: number; quizId: number };
 
-const GRADED_TYPES: readonly QuestionType[] = [
-  QuestionType.MultipleChoice,
-  QuestionType.TrueFalse,
-];
-
 /** Question id to its correct option id, in one query for every question. */
 function findCorrectOptionIds(db: Db, questions: Question[]) {
-  const ids = questions
-    .filter((q) => GRADED_TYPES.includes(q.questionType))
-    .map((q) => q.id);
+  const ids = questions.map((q) => q.id);
   const correctOptionIds = new Map<number, number>();
-  if (ids.length === 0) return correctOptionIds;
-
   const correct = db
     .select({ id: quizOptions.id, questionId: quizOptions.questionId })
     .from(quizOptions)

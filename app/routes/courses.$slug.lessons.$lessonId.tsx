@@ -65,6 +65,24 @@ const saveNoteSchema = z.object({
     ),
 });
 
+const optionIdSchema = z.coerce.number().int().positive();
+
+/** The quiz id, and each "question-{questionId}" field's option id. */
+const submitQuizSchema = z
+  .object({ quizId: z.coerce.number().int().positive() })
+  .catchall(z.unknown())
+  .transform(({ quizId, ...fields }) => {
+    const selectedAnswers: Record<number, number> = {};
+    for (const [key, value] of Object.entries(fields)) {
+      const match = /^question-(\d+)$/.exec(key);
+      const optionId = optionIdSchema.safeParse(value);
+      if (match && optionId.success) {
+        selectedAnswers[Number(match[1])] = optionId.data;
+      }
+    }
+    return { quizId, selectedAnswers };
+  });
+
 const deleteCommentSchema = z.object({
   intent: z.literal("delete-comment"),
   commentId: z.coerce.number().int(),
@@ -476,27 +494,16 @@ export async function action({ params, request }: Route.ActionArgs) {
   }
 
   if (intent === "submit-quiz") {
-    const quizId = Number(formData.get("quizId"));
-    if (isNaN(quizId)) {
+    const parsed = parseFormData(formData, submitQuizSchema);
+    if (!parsed.success) {
       throw data("Invalid quiz ID", { status: 400 });
     }
+    const { quizId, selectedAnswers } = parsed.data;
     // Scope the quiz to this lesson so a quiz elsewhere can't be reached by
     // posting its id to this route.
     const quiz = quizAttempts.findQuiz(quizId);
     if (!quiz || quiz.lessonId !== lessonId) {
       throw data("Quiz not found", { status: 404 });
-    }
-
-    // Collect answers: form fields named "question-{questionId}" with value = optionId
-    const selectedAnswers: Record<number, number> = {};
-    for (const [key, value] of formData.entries()) {
-      if (key.startsWith("question-")) {
-        const questionId = Number(key.replace("question-", ""));
-        const optionId = Number(value);
-        if (!isNaN(questionId) && !isNaN(optionId)) {
-          selectedAnswers[questionId] = optionId;
-        }
-      }
     }
 
     const result = quizAttempts.submit(currentUserId, quizId, selectedAnswers);

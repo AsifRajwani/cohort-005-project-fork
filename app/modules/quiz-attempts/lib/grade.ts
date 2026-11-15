@@ -88,21 +88,22 @@ function saveAttempt(
   attempt: QuizSubmission & { score: number; passed: boolean },
   questionResults: QuestionResult[]
 ) {
-  const saved = db.insert(quizAttempts).values(attempt).returning().get();
-
-  for (const result of questionResults) {
-    if (result.selectedOptionId !== null) {
-      db.insert(quizAnswers)
-        .values({
-          attemptId: saved.id,
-          questionId: result.questionId,
-          selectedOptionId: result.selectedOptionId,
-        })
-        .run();
-    }
-  }
-
-  return saved;
+  return db.transaction((tx) => {
+    const saved = tx.insert(quizAttempts).values(attempt).returning().get();
+    const answers = questionResults.flatMap((result) =>
+      result.selectedOptionId === null
+        ? []
+        : [
+            {
+              attemptId: saved.id,
+              questionId: result.questionId,
+              selectedOptionId: result.selectedOptionId,
+            },
+          ]
+    );
+    if (answers.length > 0) tx.insert(quizAnswers).values(answers).run();
+    return saved;
+  });
 }
 
 function gradeAndSave(

@@ -1,5 +1,4 @@
-import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import * as schema from "~/db/schema";
+import type { Db } from "~/db";
 import { eq } from "drizzle-orm";
 import { comments, courses, lessons, modules } from "~/db/schema";
 import { MAX_COMMENT_LENGTH, MIN_COMMENT_LENGTH } from "~/lib/comments";
@@ -11,7 +10,7 @@ import {
   type Notifications,
 } from "~/lib/notifications.server";
 
-export type Db = BetterSQLite3Database<typeof schema>;
+export type { Db };
 
 type Comment = typeof comments.$inferSelect;
 

@@ -1,5 +1,4 @@
-import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import * as schema from "~/db/schema";
+import type { Db } from "~/db";
 import { and, eq } from "drizzle-orm";
 import { courses, enrollments } from "~/db/schema";
 import {
@@ -10,7 +9,7 @@ import {
 
 // docs/adr/0004 explains why an Enrollment is not tied to a Purchase.
 
-export type Db = BetterSQLite3Database<typeof schema>;
+export type { Db };
 type Tx = Parameters<Parameters<Db["transaction"]>[0]>[0];
 type Queryable = Db | Tx;
 

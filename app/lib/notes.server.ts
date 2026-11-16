@@ -1,5 +1,4 @@
-import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import * as schema from "~/db/schema";
+import type { Db } from "~/db";
 import { and, desc, eq } from "drizzle-orm";
 import { courses, lessons, modules, notes } from "~/db/schema";
 import { savedLessonColumns } from "~/lib/saved-lesson.server";
@@ -10,7 +9,7 @@ import { plainText } from "~/lib/text";
 // Nothing outside the owning Student's Lesson page and Saved page may read a
 // Note body: no Instructor or Platform Admin view.
 
-export type Db = BetterSQLite3Database<typeof schema>;
+export type { Db };
 
 type Note = typeof notes.$inferSelect;
 

@@ -4,6 +4,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { courses, lessons, modules, notes } from "~/db/schema";
 import { savedLessonColumns } from "~/lib/saved-lesson.server";
 import { MAX_NOTE_LENGTH } from "~/lib/notes";
+import { normaliseNote } from "~/modules/note-draft";
 import { plainText } from "~/lib/text";
 
 // Nothing outside the owning Student's Lesson page and Saved page may read a
@@ -41,7 +42,7 @@ export function saveNote(
   body: string,
   now: Date
 ): SaveNoteResult {
-  const trimmed = plainText(body.trim());
+  const trimmed = plainText(normaliseNote(body));
   if (trimmed.length === 0) {
     return { ok: false, error: "Write something before saving your note" };
   }

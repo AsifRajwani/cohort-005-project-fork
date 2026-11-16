@@ -44,12 +44,12 @@ export function saveNote(
 ): SaveNoteResult {
   const trimmed = plainText(normaliseNote(body));
   if (trimmed.length === 0) {
-    return { ok: false, error: "Write something before saving your note" };
+    return { ok: false, error: "Write something before saving your note." };
   }
   if (trimmed.length > MAX_NOTE_LENGTH) {
     return {
       ok: false,
-      error: `Note must be ${MAX_NOTE_LENGTH} characters or fewer`,
+      error: `Your note is over ${MAX_NOTE_LENGTH.toLocaleString("en")} characters, so it was not saved.`,
     };
   }
 

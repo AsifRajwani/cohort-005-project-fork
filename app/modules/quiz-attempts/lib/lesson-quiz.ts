@@ -1,3 +1,4 @@
+import type { QuestionType } from "~/db/schema";
 import {
   getBestAttempt,
   getQuizByLessonId,
@@ -12,7 +13,7 @@ export type LessonQuiz = {
   questions: Array<{
     id: number;
     questionText: string;
-    questionType: string;
+    questionType: QuestionType;
     position: number;
     options: Array<{ id: number; optionText: string }>;
   }>;
@@ -20,10 +21,9 @@ export type LessonQuiz = {
 
 export type BestAttempt = { score: number; passed: boolean };
 
-function toLessonQuiz(
+function withoutAnswers(
   quizData: NonNullable<ReturnType<typeof getQuizWithQuestions>>
 ): LessonQuiz {
-  // Strip isCorrect from options so answers aren't leaked to the client
   return {
     id: quizData.id,
     title: quizData.title,
@@ -54,7 +54,7 @@ export function getLessonQuiz(
   const best = userId ? getBestAttempt(db, userId, quizRecord.id) : undefined;
 
   return {
-    quiz: quizData ? toLessonQuiz(quizData) : null,
+    quiz: quizData ? withoutAnswers(quizData) : null,
     bestAttempt: best ? { score: best.score, passed: best.passed } : null,
   };
 }

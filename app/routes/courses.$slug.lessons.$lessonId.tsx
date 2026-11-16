@@ -9,7 +9,6 @@ import {
 import { lessonProgress } from "~/modules/lesson-progress/index.server";
 import { lessonThread } from "~/modules/lesson-thread/index.server";
 import { quizAttempts } from "~/modules/quiz-attempts/index.server";
-import { normaliseNote } from "~/modules/note-draft";
 import {
   createComment,
   deleteComment,
@@ -18,7 +17,6 @@ import {
 import { defaultNotifications } from "~/lib/notifications.server";
 import { isBookmarked, toggleBookmark } from "~/lib/bookmarks.server";
 import { getNote, saveNote } from "~/lib/notes.server";
-import { MAX_NOTE_LENGTH } from "~/lib/notes";
 import { db } from "~/db";
 import {
   categories,
@@ -50,20 +48,7 @@ const editCommentSchema = z.object({
   body: z.string(),
 });
 
-const saveNoteSchema = z.object({
-  body: z
-    .string()
-    .transform(normaliseNote)
-    .pipe(
-      z
-        .string()
-        .min(1, "Write something before saving your note.")
-        .max(
-          MAX_NOTE_LENGTH,
-          `Your note is over ${MAX_NOTE_LENGTH.toLocaleString("en")} characters, so it was not saved.`
-        )
-    ),
-});
+const saveNoteSchema = z.object({ body: z.string() });
 
 const optionIdSchema = z.coerce.number().int().positive();
 

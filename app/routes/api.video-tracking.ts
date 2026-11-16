@@ -3,8 +3,7 @@ import { z } from "zod";
 import type { Route } from "./+types/api.video-tracking";
 import { coursePermissions } from "~/modules/permissions/course-permissions.server";
 import { parseJsonBody } from "~/lib/validation";
-import { db } from "~/db";
-import { videoWatchEvents } from "~/db/schema";
+import { lessonProgress } from "~/modules/lesson-progress/index.server";
 
 const videoTrackingSchema = z.object({
   lessonId: z.number(),
@@ -29,15 +28,10 @@ export async function action({ request }: Route.ActionArgs) {
     { lessonId }
   );
 
-  db.insert(videoWatchEvents)
-    .values({
-      userId: person.id,
-      lessonId,
-      eventType,
-      positionSeconds,
-    })
-    .returning()
-    .get();
+  lessonProgress.recordWatch(
+    { userId: person.id, lessonId, eventType, positionSeconds },
+    new Date()
+  );
 
   return { success: true };
 }

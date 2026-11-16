@@ -14,8 +14,8 @@ export function createLessonThread(database: Db) {
     findComment: (commentId: number) => getCommentById(database, commentId),
     /**
      * The Lesson's questions, oldest first, each with its replies and with
-     * every body rendered to sanitised HTML. A deleted question stays only
-     * while it has replies; a deleted reply is dropped.
+     * every body rendered to sanitised HTML. Which deleted comments still
+     * show is ADR 0015.
      */
     render: (lessonId: number) =>
       renderThread(getLessonThread(database, lessonId)),

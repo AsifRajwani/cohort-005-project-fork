@@ -1,6 +1,5 @@
-import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { and, desc, eq, or, sql } from "drizzle-orm";
-import * as schema from "~/db/schema";
+import type { Db } from "~/db";
 import {
   lessonProgress,
   lessons,
@@ -9,12 +8,12 @@ import {
   LessonProgressStatus,
 } from "~/db/schema";
 
-export type Db = BetterSQLite3Database<typeof schema>;
+export type { Db };
 
 /** A Student's place in one Lesson. */
 export type LessonWatch = { userId: number; lessonId: number };
 
-export function getLessonProgress(db: Db, userId: number, lessonId: number) {
+export function getLessonProgress(db: Db, { userId, lessonId }: LessonWatch) {
   return db
     .select()
     .from(lessonProgress)
@@ -65,7 +64,7 @@ export function markLessonComplete(
   { userId, lessonId }: LessonWatch,
   now: Date
 ) {
-  const existing = getLessonProgress(db, userId, lessonId);
+  const existing = getLessonProgress(db, { userId, lessonId });
 
   if (existing) {
     return db
@@ -91,8 +90,11 @@ export function markLessonComplete(
     .get();
 }
 
-export function markLessonInProgress(db: Db, userId: number, lessonId: number) {
-  const existing = getLessonProgress(db, userId, lessonId);
+export function markLessonInProgress(
+  db: Db,
+  { userId, lessonId }: LessonWatch
+) {
+  const existing = getLessonProgress(db, { userId, lessonId });
 
   if (existing) {
     if (existing.status === LessonProgressStatus.Completed) {
@@ -117,7 +119,24 @@ export function markLessonInProgress(db: Db, userId: number, lessonId: number) {
     .get();
 }
 
-export function getLastWatchPosition(db: Db, userId: number, lessonId: number) {
+/** A moment the Student's video player reported, such as play or progress. */
+export type WatchEvent = LessonWatch & {
+  eventType: string;
+  positionSeconds: number;
+};
+
+export function recordWatchEvent(db: Db, event: WatchEvent, now: Date) {
+  return db
+    .insert(videoWatchEvents)
+    .values({ ...event, createdAt: now.toISOString() })
+    .returning()
+    .get();
+}
+
+export function getLastWatchPosition(
+  db: Db,
+  { userId, lessonId }: LessonWatch
+) {
   const lastEvent = db
     .select()
     .from(videoWatchEvents)

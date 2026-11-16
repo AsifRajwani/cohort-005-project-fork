@@ -1,14 +1,15 @@
 import { and, eq, inArray } from "drizzle-orm";
 import {
-  quizzes,
   quizQuestions,
   quizOptions,
   quizAttempts,
   quizAnswers,
 } from "~/db/schema";
-import type { Db } from "./quiz";
+import { getQuizById, getQuizQuestions, type Db } from "./quiz";
 
-export function calculateGrade(score: number): string {
+export type Grade = "A" | "B" | "C" | "D" | "F";
+
+export function calculateGrade(score: number): Grade {
   if (score >= 0.9) return "A";
   if (score >= 0.8) return "B";
   if (score >= 0.7) return "C";
@@ -101,19 +102,13 @@ function gradeAndSave(
   { userId, quizId }: QuizSubmission,
   selectedAnswers: Record<number, number>
 ) {
-  const quiz = db.select().from(quizzes).where(eq(quizzes.id, quizId)).get();
+  const quiz = getQuizById(db, quizId);
   if (!quiz) {
     console.error("quiz not found");
     return null;
   }
 
-  const questions = db
-    .select()
-    .from(quizQuestions)
-    .where(eq(quizQuestions.quizId, quizId))
-    .orderBy(quizQuestions.position)
-    .all();
-
+  const questions = getQuizQuestions(db, quizId);
   const correctOptionIds = findCorrectOptionIds(db, questions);
   const questionResults = questions.map((q) =>
     gradeQuestion(q, selectedAnswers, correctOptionIds)

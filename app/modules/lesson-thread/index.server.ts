@@ -1,5 +1,5 @@
-import { db } from "~/db";
-import { getCommentById, getLessonThread, type Db } from "./lib/thread";
+import { db, type Db } from "~/db";
+import { getCommentById, getLessonThread } from "./lib/thread";
 import { renderThread } from "./lib/render.server";
 
 export type { RenderedComment } from "./lib/render.server";
@@ -14,8 +14,8 @@ export function createLessonThread(database: Db) {
     findComment: (commentId: number) => getCommentById(database, commentId),
     /**
      * The Lesson's questions, oldest first, each with its replies and with
-     * every body rendered to sanitised HTML. A deleted question stays only
-     * while it has replies; a deleted reply is dropped.
+     * every body rendered to sanitised HTML. Which deleted comments still
+     * show is ADR 0015.
      */
     render: (lessonId: number) =>
       renderThread(getLessonThread(database, lessonId)),

@@ -40,17 +40,11 @@ function addLesson(moduleId: number, position = 1) {
     .get();
 }
 
-// Watch events are recorded by the video-tracking route.
-function watched(lessonId: number, positionSeconds: number, createdAt: string) {
-  db.insert(schema.videoWatchEvents)
-    .values({
-      userId: studentId,
-      lessonId,
-      eventType: "progress",
-      positionSeconds,
-      createdAt,
-    })
-    .run();
+function watched(lessonId: number, positionSeconds: number, at: string) {
+  progress.recordWatch(
+    { userId: studentId, lessonId, eventType: "progress", positionSeconds },
+    new Date(at)
+  );
 }
 
 describe("marking progress", () => {

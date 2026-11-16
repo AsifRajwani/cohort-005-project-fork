@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { eq } from "drizzle-orm";
 import { createTestDb, seedBaseData, type TestDb } from "~/test/setup";
 import * as schema from "~/db/schema";
 import { QuestionType } from "~/db/schema";
@@ -261,21 +260,15 @@ describe("submitting a quiz", () => {
       [q1.questionId]: q1.options[1],
     });
 
-    const attempt = db
-      .select()
-      .from(schema.quizAttempts)
-      .where(eq(schema.quizAttempts.id, result?.attemptId ?? -1))
-      .get();
+    const attempt = quizzes.findAttempt(result?.attemptId ?? -1);
     expect(attempt).toMatchObject({
       userId: studentId,
       quizId,
       score: 0.5,
       passed: false,
     });
-    const answers = db.select().from(schema.quizAnswers).all();
-    expect(answers).toEqual([
+    expect(attempt?.answers).toEqual([
       expect.objectContaining({
-        attemptId: result?.attemptId,
         questionId: q1.questionId,
         selectedOptionId: q1.options[1],
       }),

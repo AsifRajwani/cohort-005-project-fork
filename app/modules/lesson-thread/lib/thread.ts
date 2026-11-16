@@ -1,6 +1,5 @@
-import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { asc, eq } from "drizzle-orm";
-import * as schema from "~/db/schema";
+import type { Db } from "~/db";
 import {
   comments,
   courses,
@@ -10,8 +9,6 @@ import {
   UserRole,
 } from "~/db/schema";
 import { markdown, type Markdown } from "~/lib/text";
-
-export type Db = BetterSQLite3Database<typeof schema>;
 
 type CommentAuthor = {
   id: number;
@@ -114,6 +111,10 @@ export function getLessonThread(db: Db, lessonId: number): ThreadComment[] {
       ?.replies.push(toThreadComment(row, course.instructorId));
   }
 
-  // A deleted question with no replies left has nothing worth showing.
-  return topLevel.filter((c) => !c.deleted || c.replies.length > 0);
+  return topLevel.filter(isStillShown);
+}
+
+/** See ADR 0015. */
+function isStillShown(question: ThreadComment) {
+  return !question.deleted || question.replies.length > 0;
 }

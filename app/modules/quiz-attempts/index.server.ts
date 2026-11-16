@@ -1,10 +1,10 @@
-import { db } from "~/db";
-import { getQuizById, type Db } from "./lib/quiz";
+import { db, type Db } from "~/db";
+import { getAttempt, getQuizById } from "./lib/quiz";
 import { getLessonQuiz } from "./lib/lesson-quiz";
 import { computeResult } from "./lib/grade";
 
 export type { BestAttempt, LessonQuiz } from "./lib/lesson-quiz";
-export type { QuestionResult, QuizResult } from "./lib/grade";
+export type { Grade, QuestionResult, QuizResult } from "./lib/grade";
 
 /**
  * A Lesson's quiz and the Students' attempts at it, bound to a database. The
@@ -13,6 +13,8 @@ export type { QuestionResult, QuizResult } from "./lib/grade";
 export function createQuizAttempts(database: Db) {
   return {
     findQuiz: (quizId: number) => getQuizById(database, quizId),
+    /** A recorded attempt and the answers it gave; null if there is none. */
+    findAttempt: (attemptId: number) => getAttempt(database, attemptId),
     /** The quiz as a Student may see it (no answers), and their best score. */
     forLesson: (lessonId: number, userId: number | null) =>
       getLessonQuiz(database, lessonId, userId),

@@ -45,7 +45,7 @@ function openDatabase(filename: string) {
 /** The app's database, or a test database built the same way. */
 export type Db = BetterSQLite3Database<typeof schema>;
 
-let instance: ReturnType<typeof drizzle<typeof schema>> | undefined;
+let instance: Db | undefined;
 
 function getDb() {
   if (!instance) {

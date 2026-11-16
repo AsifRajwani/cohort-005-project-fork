@@ -1,5 +1,5 @@
-import { db } from "~/db";
-import { getCommentById, getLessonThread, type Db } from "./lib/thread";
+import { db, type Db } from "~/db";
+import { getCommentById, getLessonThread } from "./lib/thread";
 import { renderThread } from "./lib/render.server";
 
 export type { RenderedComment } from "./lib/render.server";

@@ -1,9 +1,9 @@
+import type { Db } from "~/db";
 import type { QuestionType } from "~/db/schema";
 import {
   getBestAttempt,
   getQuizByLessonId,
   getQuizWithQuestions,
-  type Db,
 } from "./quiz";
 
 export type LessonQuiz = {

@@ -8,8 +8,6 @@ import {
   LessonProgressStatus,
 } from "~/db/schema";
 
-export type { Db };
-
 /** A Student's place in one Lesson. */
 export type LessonWatch = { userId: number; lessonId: number };
 

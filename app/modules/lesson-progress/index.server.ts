@@ -1,4 +1,4 @@
-import { db } from "~/db";
+import { db, type Db } from "~/db";
 import {
   calculateWatchProgress,
   getLastWatchPosition,
@@ -7,7 +7,6 @@ import {
   markLessonComplete,
   markLessonInProgress,
   recordWatchEvent,
-  type Db,
   type WatchEvent,
 } from "./lib/progress";
 

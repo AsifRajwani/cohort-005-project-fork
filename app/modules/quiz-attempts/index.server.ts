@@ -1,5 +1,5 @@
-import { db } from "~/db";
-import { getAttempt, getQuizById, type Db } from "./lib/quiz";
+import { db, type Db } from "~/db";
+import { getAttempt, getQuizById } from "./lib/quiz";
 import { getLessonQuiz } from "./lib/lesson-quiz";
 import { computeResult } from "./lib/grade";
 

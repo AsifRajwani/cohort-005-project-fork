@@ -5,7 +5,8 @@ import {
   quizAttempts,
   quizAnswers,
 } from "~/db/schema";
-import { getQuizById, getQuizQuestions, type Db } from "./quiz";
+import type { Db } from "~/db";
+import { getQuizById, getQuizQuestions } from "./quiz";
 
 export type Grade = "A" | "B" | "C" | "D" | "F";
 

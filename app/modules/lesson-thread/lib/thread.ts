@@ -10,8 +10,6 @@ import {
 } from "~/db/schema";
 import { markdown, type Markdown } from "~/lib/text";
 
-export type { Db };
-
 type CommentAuthor = {
   id: number;
   name: string;

@@ -8,8 +8,6 @@ import {
   quizAnswers,
 } from "~/db/schema";
 
-export type { Db };
-
 export function getQuizById(db: Db, quizId: number) {
   return db.select().from(quizzes).where(eq(quizzes.id, quizId)).get();
 }

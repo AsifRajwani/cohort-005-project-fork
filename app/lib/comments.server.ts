@@ -10,8 +10,6 @@ import {
   type Notifications,
 } from "~/lib/notifications.server";
 
-export type { Db };
-
 type Comment = typeof comments.$inferSelect;
 
 function lessonExists(db: Db, lessonId: number) {

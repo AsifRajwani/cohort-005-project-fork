@@ -14,8 +14,6 @@ import {
 } from "~/lib/notifications.server";
 import { checkCountryLock } from "~/lib/ppp";
 
-export type { Db };
-
 type Seat = typeof coupons.$inferSelect;
 type Enrollment = typeof enrollments.$inferSelect;
 

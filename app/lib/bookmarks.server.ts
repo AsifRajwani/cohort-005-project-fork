@@ -3,8 +3,6 @@ import { and, desc, eq } from "drizzle-orm";
 import { bookmarks, courses, lessons, modules } from "~/db/schema";
 import { savedLessonColumns } from "~/lib/saved-lesson.server";
 
-export type { Db };
-
 /** Whether the Student has bookmarked the Lesson. */
 export function isBookmarked(
   db: Db,

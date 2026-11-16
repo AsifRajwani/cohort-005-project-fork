@@ -9,7 +9,6 @@ import {
 
 // docs/adr/0004 explains why an Enrollment is not tied to a Purchase.
 
-export type { Db };
 type Tx = Parameters<Parameters<Db["transaction"]>[0]>[0];
 type Queryable = Db | Tx;
 

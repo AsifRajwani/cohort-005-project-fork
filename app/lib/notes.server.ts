@@ -9,8 +9,6 @@ import { plainText } from "~/lib/text";
 // Nothing outside the owning Student's Lesson page and Saved page may read a
 // Note body: no Instructor or Platform Admin view.
 
-export type { Db };
-
 type Note = typeof notes.$inferSelect;
 
 /** The Student's Note on the Lesson, if they have written one. */

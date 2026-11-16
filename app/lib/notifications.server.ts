@@ -1,7 +1,6 @@
 import { existsSync } from "node:fs";
 import { eq } from "drizzle-orm";
-import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import * as schema from "~/db/schema";
+import type { Db } from "~/db";
 import { users } from "~/db/schema";
 import type {
   FeedCredentials,
@@ -44,7 +43,7 @@ export function toNotificationPerson(
 
 /** The user as a Notification recipient or actor, or undefined if missing. */
 export function findNotificationPerson(
-  db: BetterSQLite3Database<typeof schema>,
+  db: Db,
   userId: number
 ): NotificationPerson | undefined {
   return db

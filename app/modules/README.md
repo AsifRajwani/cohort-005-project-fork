@@ -26,4 +26,6 @@ Enforced by dependency-cruiser (`.dependency-cruiser.cjs`). Run `npm run lint:bo
 3. **Tests through the entry points.** Files in `<module>/tests/` import any module's entry points and their own `tests/` fixtures, never any module's subfolder internals, not even their own. Nothing outside `tests/` may import from it.
 4. **No cycles.** No dependency cycles anywhere in `app/`.
 
+**A module that takes over a table lists it** in `MODULE_OF_TABLE` in `lint-rules/db.js`, so the `db/module-owned-tables` oxlint rule stops routes reaching it directly.
+
 Modules are flat: one level of folders under `app/modules/`. A module may not contain another module.

@@ -66,16 +66,32 @@ agent-browser eval "fetch('/api/switch-user',{method:'POST',body:new URLSearchPa
 
 `npm run db:seed` on a fresh database gives these ids:
 
-| id  | User             | Who                                                      |
-| --- | ---------------- | -------------------------------------------------------- |
-| 1   | Alex Rivera      | Admin                                                    |
-| 2   | Sarah Chen       | Instructor                                               |
-| 5   | Emma Wilson      | Student, enrolled in `introduction-to-typescript`        |
-| 10  | Bossy McBossface | Student with no enrollments: the locked view of a lesson |
+| id  | User             | Who                                                                                    |
+| --- | ---------------- | -------------------------------------------------------------------------------------- |
+| 1   | Alex Rivera      | Admin                                                                                  |
+| 2   | Sarah Chen       | Instructor                                                                             |
+| 5   | Emma Wilson      | Student, enrolled in `introduction-to-typescript` and `building-rest-apis-with-nodejs` |
+| 10  | Bossy McBossface | Student with no enrollments: the locked view of a lesson                               |
 
 `scripts/seed.ts` has the rest.
 
-## Two things that will bite you
+## Test data
+
+Find a Lesson of `building-rest-apis-with-nodejs` to open as Emma, and one
+with a quiz, with:
+
+```bash
+sqlite3 data.db "select l.id, q.id is not null as has_quiz from lessons l join modules m on m.id=l.module_id join courses c on c.id=m.course_id left join quizzes q on q.lesson_id=l.id where c.slug='building-rest-apis-with-nodejs' order by m.position, l.position limit 5;"
+```
+
+Test data you write (a Note, a quiz attempt) stays in `data.db`; delete it
+when you are done, or reseed.
+
+## Three things that will bite you
+
+**A Lesson page never reaches "networkidle".** The video player keeps the
+network busy, so `wait --load networkidle` times out after 25 seconds. Wait
+for an element on the page instead.
 
 **Hydration lags "networkidle".** The button is in the server HTML before
 React attaches its `onClick`, so the first click can be a silent no-op. Poll

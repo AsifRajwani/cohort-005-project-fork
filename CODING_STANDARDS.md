@@ -33,14 +33,20 @@ does not import `~/db` or `drizzle-orm` itself. The instructor analytics
 route gets everything from `instructorAnalytics`. A query in the loader
 splits the feature's rules across two files, and the module's tests stop
 covering what the page shows. `npm run lint:boundaries` enforces this for the
-instructor analytics route only; apply it to every other module by hand. See
+instructor analytics route, and the `db/module-owned-tables` lint rule stops
+any route importing a table a module owns (`lint-rules/db.js` lists them).
+Apply it to the rest of a module's data by hand. See
 [app/modules/README.md](./app/modules/README.md).
 
 ## Arrange tests through the module under test
 
-Test setup calls the module's own functions. When the function you need does
-not exist, add it to the module rather than inserting rows directly, so a
-change to how the module stores its data leaves its tests alone.
+Test setup and assertions both call the module's own functions. When the
+function you need does not exist, add it to the module rather than inserting
+or selecting rows directly, so a change to how the module stores its data
+leaves its tests alone. This covers data the module only reads: if another
+file writes it, move the write into the module and call it from there.
+Insert rows directly only for data another part of the app owns, such as
+courses and lessons in a progress test.
 
 ## A split the token check forced is in scope
 
@@ -142,4 +148,6 @@ code without reading it.
 When a diff touches a comment that records a decision, delete the comment,
 write the ADR if the decision still stands, and name both in the PR. Several
 such comments in one area mean decisions are skipping the ADR step: flag
-that in the PR too.
+that in the PR too. Moving a comment touches it: a split that carries one
+into a new file owes the ADR, even when `--color-moved` shows the line
+unchanged.

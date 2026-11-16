@@ -1,7 +1,11 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["typescript", "react", "jsx-a11y", "import", "vitest"],
-  "jsPlugins": ["./lint-rules/sql-raw.js", "./lint-rules/input.js"],
+  "jsPlugins": [
+    "./lint-rules/sql-raw.js",
+    "./lint-rules/input.js",
+    "./lint-rules/db.js"
+  ],
   "categories": {
     "correctness": "error"
   },
@@ -87,7 +91,8 @@
     "vitest/no-disabled-tests": "error",
     "vitest/no-focused-tests": "error",
     "sql/no-dynamic-raw": "error",
-    "input/no-number-coercion": "error"
+    "input/no-number-coercion": "error",
+    "db/shared-db-type": "error"
   },
   "overrides": [
     {
@@ -101,6 +106,47 @@
       ],
       "rules": {
         "import/no-default-export": "off"
+      }
+    },
+    {
+      "files": ["app/db/index.ts"],
+      "rules": {
+        "db/shared-db-type": "off"
+      }
+    },
+    // Files that still declare their own database type, because changing them
+    // means splitting them under the token limit first. Remove each entry once
+    // the file imports Db from ~/db.
+    {
+      "files": [
+        "app/lib/refunds.server.ts",
+        "app/modules/instructor-analytics/lib/instructor-analytics.ts"
+      ],
+      "rules": {
+        "db/shared-db-type": "off"
+      }
+    },
+    {
+      "files": ["app/routes/**"],
+      "rules": {
+        "db/module-owned-tables": "error"
+      }
+    },
+    // Routes that already import a table a module owns. Remove each entry once
+    // the route asks the module instead.
+    {
+      "files": [
+        "app/routes/courses.$slug.$moduleId.tsx",
+        "app/routes/courses.$slug.tsx",
+        "app/routes/courses.tsx",
+        "app/routes/dashboard.tsx",
+        "app/routes/instructor.$courseId.lessons.$lessonId.quiz.tsx",
+        "app/routes/instructor.$courseId.students.tsx",
+        "app/routes/instructor.$courseId.tsx",
+        "app/routes/layout.app.tsx"
+      ],
+      "rules": {
+        "db/module-owned-tables": "off"
       }
     },
     {
